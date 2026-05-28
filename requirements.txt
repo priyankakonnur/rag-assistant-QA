@@ -4,10 +4,9 @@ pymongo
 python-multipart
 python-jose
 passlib[bcrypt]
-sentence-transformers
 qdrant-client
 PyPDF2
-openai
 pypdf
-langchain_text_splitters
-ollama
+langchain-text-splitters
+openai
+fastembed

@@ -1,10 +1,24 @@
-import ollama
+from fastembed import TextEmbedding
 
-def create_embedding(text):
+embedding_model = None
 
-    response = ollama.embeddings(
-        model="nomic-embed-text",
-        prompt=text
+
+def get_model():
+    global embedding_model
+
+    if embedding_model is None:
+        embedding_model = TextEmbedding(
+            model_name="BAAI/bge-small-en-v1.5"
+        )
+
+    return embedding_model
+
+
+def create_embedding(text: str):
+    model = get_model()
+
+    embeddings = list(
+        model.embed([text])
     )
 
-    return response["embedding"]
+    return embeddings[0].tolist()
