@@ -1,23 +1,25 @@
 import os
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
 import uuid
 
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams, PointStruct
 
-client = QdrantClient(url=QDRANT_URL)
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+
+client = QdrantClient(
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY
+)
 
 COLLECTION_NAME = "documents"
 
 
 def create_collection():
-
     collections = client.get_collections().collections
-
     existing = [collection.name for collection in collections]
 
     if COLLECTION_NAME not in existing:
-
         client.create_collection(
             collection_name=COLLECTION_NAME,
             vectors_config=VectorParams(
@@ -28,11 +30,9 @@ def create_collection():
 
 
 def store_chunks(chunks, embeddings):
-
     points = []
 
     for chunk, embedding in zip(chunks, embeddings):
-
         point = PointStruct(
             id=str(uuid.uuid4()),
             vector=embedding,
@@ -49,7 +49,7 @@ def store_chunks(chunks, embeddings):
 
 def search_query(query_embedding):
     results = client.query_points(
-        collection_name="documents",
+        collection_name=COLLECTION_NAME,
         query=query_embedding,
         limit=3
     ).points
