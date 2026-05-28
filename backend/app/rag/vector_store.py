@@ -1,8 +1,11 @@
+import os
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 import uuid
 
-client = QdrantClient("localhost", port=6333)
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+
+client = QdrantClient(url=QDRANT_URL)
 
 COLLECTION_NAME = "documents"
 

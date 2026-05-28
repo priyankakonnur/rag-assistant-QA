@@ -1,6 +1,20 @@
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
-MONGO_URL = "mongodb://localhost:27017"
+# MONGO_URL = "mongodb://localhost:27017"
+
+# client = MongoClient(MONGO_URL)
+
+# database = client["rag_project"]
+
+# users_collection = database["users"]
+
+# chat_collection = database["chat_history"]
+
+
+from pymongo import MongoClient
+import os
+
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 
 client = MongoClient(MONGO_URL)
 
