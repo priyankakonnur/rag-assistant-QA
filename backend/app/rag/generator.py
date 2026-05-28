@@ -1,20 +1,18 @@
-import ollama
-
 def generate_answer(context, question):
 
+    if not context.strip():
+        return "No relevant answer found."
+
     prompt = f"""
-    Answer the question using the context below.
+Answer the question using the context below.
 
-    Context:
-    {context}
+Context:
+{context}
 
-    Question:
-    {question}
-    """
+Question:
+{question}
+"""
 
-    response = ollama.generate(
-        model="llama3.2:3b",
-        prompt=prompt
-    )
-
-    return response["response"]
+    # Temporary fallback:
+    # return retrieved context directly
+    return context[:1500]
