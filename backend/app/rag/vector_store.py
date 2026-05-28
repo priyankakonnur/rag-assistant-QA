@@ -2,22 +2,38 @@ import os
 import uuid
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
-
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-
-client = QdrantClient(
-    url=QDRANT_URL,
-    api_key=QDRANT_API_KEY
+from qdrant_client.models import (
+    Distance,
+    VectorParams,
+    PointStruct
 )
+
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 COLLECTION_NAME = "documents"
 
+client = None
+
+
+def get_client():
+    global client
+
+    if client is None:
+        client = QdrantClient(
+            url=QDRANT_URL,
+            api_key=QDRANT_API_KEY
+        )
+
+    return client
+
 
 def create_collection():
+
+    client = get_client()
+
     collections = client.get_collections().collections
-    existing = [collection.name for collection in collections]
+    existing = [c.name for c in collections]
 
     if COLLECTION_NAME not in existing:
         client.create_collection(
@@ -30,16 +46,19 @@ def create_collection():
 
 
 def store_chunks(chunks, embeddings):
+
+    client = get_client()
+
     points = []
 
     for chunk, embedding in zip(chunks, embeddings):
-        point = PointStruct(
-            id=str(uuid.uuid4()),
-            vector=embedding,
-            payload={"text": chunk}
+        points.append(
+            PointStruct(
+                id=str(uuid.uuid4()),
+                vector=embedding,
+                payload={"text": chunk}
+            )
         )
-
-        points.append(point)
 
     client.upsert(
         collection_name=COLLECTION_NAME,
@@ -48,6 +67,9 @@ def store_chunks(chunks, embeddings):
 
 
 def search_query(query_embedding):
+
+    client = get_client()
+
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         query=query_embedding,
