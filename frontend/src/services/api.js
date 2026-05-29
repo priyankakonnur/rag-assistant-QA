@@ -49,8 +49,11 @@ export const askQuestion = async (
 ) => {
   const res = await api.post(
     "/ask",
-    { question },
+    null,
     {
+      params: {
+        query: question,
+      },
       headers: {
         Authorization: `Bearer ${token}`,
       },
