@@ -12,6 +12,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",  # React (Vite)
     "http://127.0.0.1:5173",
+    "https://rag-assistant-qa.vercel.app",
 ]
 
 app.add_middleware(
