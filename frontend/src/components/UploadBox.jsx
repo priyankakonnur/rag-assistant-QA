@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api from "../services/api";
+import { uploadPdf } from "../services/api";
 import { getToken } from "../services/auth";
 
 export default function UploadBox() {
@@ -12,31 +12,32 @@ export default function UploadBox() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    setUploading(true);
-
     try {
-      const response = await api.post(
-        "/upload",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`
-          }
-        }
+      setUploading(true);
+
+      const res = await uploadPdf(
+        file,
+        getToken()
       );
 
-      console.log(response.data);
+      console.log("Upload response:", res);
 
-      alert("PDF uploaded successfully");
+      if (res?.detail) {
+        alert(res.detail);
+      } else {
+        alert("PDF uploaded successfully");
+      }
+
+      setFile(null);
     } catch (error) {
-      console.error(error);
-      alert("Upload failed");
-    }
+      console.error("Upload Error:", error);
 
-    setUploading(false);
+      alert(
+        "Upload failed. Please try again."
+      );
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -74,9 +75,11 @@ export default function UploadBox() {
         <button
           onClick={uploadFile}
           disabled={uploading}
-          className="mt-6 bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition"
+          className="mt-6 bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition disabled:opacity-50"
         >
-          {uploading ? "Uploading..." : "Upload"}
+          {uploading
+            ? "Uploading..."
+            : "Upload"}
         </button>
       )}
     </div>

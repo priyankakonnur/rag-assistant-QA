@@ -54,7 +54,7 @@ async def upload_pdf(
     }
 
 
-@router.get("/ask")
+@router.post("/ask")
 def ask(
     query: str,
     user=Depends(JWTBearer())
