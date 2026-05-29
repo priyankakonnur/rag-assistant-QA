@@ -35,14 +35,20 @@ def create_collection():
     collections = client.get_collections().collections
     existing = [c.name for c in collections]
 
-    if COLLECTION_NAME not in existing:
-        client.create_collection(
-            collection_name=COLLECTION_NAME,
-            vectors_config=VectorParams(
-                size=768,
-                distance=Distance.COSINE
-            )
+    # delete old 768-dim collection
+    if COLLECTION_NAME in existing:
+        client.delete_collection(
+            collection_name=COLLECTION_NAME
         )
+
+    # recreate with correct size
+    client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(
+            size=384,
+            distance=Distance.COSINE
+        )
+    )
 
 
 def store_chunks(chunks, embeddings):
@@ -56,7 +62,9 @@ def store_chunks(chunks, embeddings):
             PointStruct(
                 id=str(uuid.uuid4()),
                 vector=embedding,
-                payload={"text": chunk}
+                payload={
+                    "text": chunk
+                }
             )
         )
 
