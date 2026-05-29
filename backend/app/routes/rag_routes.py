@@ -1,11 +1,12 @@
+import os
+import shutil
+
 from fastapi import (
     APIRouter,
     UploadFile,
     File,
     Depends
 )
-
-import shutil
 
 from app.auth.auth_bearer import JWTBearer
 
@@ -20,47 +21,43 @@ router = APIRouter(
 
 UPLOAD_DIR = "uploads"
 
-@router.post("/upload")
 
+@router.post("/upload")
 async def upload_pdf(
     file: UploadFile = File(...),
-    user = Depends(JWTBearer())
+    user=Depends(JWTBearer())
 ):
 
-    file_path = f"{UPLOAD_DIR}/{file.filename}"
+    # Create uploads folder if missing
+    os.makedirs(
+        UPLOAD_DIR,
+        exist_ok=True
+    )
+
+    file_path = os.path.join(
+        UPLOAD_DIR,
+        file.filename
+    )
 
     with open(file_path, "wb") as buffer:
-
         shutil.copyfileobj(
             file.file,
             buffer
         )
 
-    result = process_document(file_path)
+    result = process_document(
+        file_path
+    )
 
     return {
         "message": result
     }
 
 
-# @router.get("/ask")
-
-# def ask(
-#     query: str,
-#     user = Depends(JWTBearer())
-# ):
-
-#     answer = ask_question(query)
-
-#     return {
-#         "answer": answer
-#     }
-
 @router.get("/ask")
-
 def ask(
     query: str,
-    user = Depends(JWTBearer())
+    user=Depends(JWTBearer())
 ):
 
     answer = ask_question(
